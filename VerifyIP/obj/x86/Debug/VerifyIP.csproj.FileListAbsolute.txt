@@ -1,0 +1,7 @@
+/home/bruno/Projects/VerifyIP/VerifyIP/bin/Debug/VerifyIP.exe
+/home/bruno/Projects/VerifyIP/VerifyIP/bin/Debug/VerifyIP.pdb
+/home/bruno/Projects/VerifyIP/VerifyIP/obj/x86/Debug/VerifyIP.csprojResolveAssemblyReference.cache
+/home/bruno/Projects/VerifyIP/VerifyIP/obj/x86/Debug/VerifyIP.csproj.CoreCompileInputs.cache
+/home/bruno/Projects/VerifyIP/VerifyIP/obj/x86/Debug/VerifyIP.exe
+/home/bruno/Projects/VerifyIP/VerifyIP/obj/x86/Debug/VerifyIP.pdb
+/home/bruno/Projects/VerifyIP/VerifyIP/bin/Debug/input.csv

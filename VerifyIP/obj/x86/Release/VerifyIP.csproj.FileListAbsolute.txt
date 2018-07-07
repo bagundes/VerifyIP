@@ -1,0 +1,4 @@
+/home/bruno/Projects/VerifyIP/VerifyIP/bin/Release/input.csv
+/home/bruno/Projects/VerifyIP/VerifyIP/bin/Release/VerifyIP.exe
+/home/bruno/Projects/VerifyIP/VerifyIP/obj/x86/Release/VerifyIP.csproj.CoreCompileInputs.cache
+/home/bruno/Projects/VerifyIP/VerifyIP/obj/x86/Release/VerifyIP.exe
