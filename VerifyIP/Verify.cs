@@ -3,28 +3,33 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Linq;
 
 namespace VerifyIP
 {
     public class Verify
     {
-        public Verify(string input, string output, string ip, int timeout = 3 * 1000)
-        {
+        public static void Start(string input, string output, string ip, int timeout = 3 * 1000)
+		{
 			var urls = ListUrls(input);
-			ip = ip ?? ".";
+			var ips = ip.Split(';');
+			var c = 0F;
 
             foreach(var url in urls)
 			{
+				Double perc = Math.Round((++c / urls.Count) * 100);
+
 				if (String.IsNullOrEmpty(url))
-					continue;
-				
-				Console.WriteLine($"Test {url}");
+                    continue;
+				            
+				Console.WriteLine($"{perc}% - {url}");
+               
                 var message = String.Empty;
                 var ipUrl = String.Empty;
+
                 try
                 {
 					ipUrl = PingAddress(url,timeout);
-                    Console.Write($" - {url}");
                 }
                 catch (Exception ex)
                 {
@@ -32,7 +37,7 @@ namespace VerifyIP
                 }
                 finally
                 {
-					if(ip != ipUrl)
+					if(!ips.Contains(ipUrl))
 					    WriteList(output, url, ipUrl, message);
                 }
 			}
@@ -44,7 +49,7 @@ namespace VerifyIP
         /// <param name="url">URL.</param>
         /// <param name="ip">Ip.</param>
         /// <param name="message">Message.</param>
-		private void WriteList(string output, string url, string ip, string message)
+		public static void WriteList(string output, string url, string ip, string message)
         {
 			string path = @output;
             string appendText = $"{url};{ip};{message}\n";
@@ -59,12 +64,28 @@ namespace VerifyIP
             File.AppendAllText(path, appendText);
         }
 
+        /// <summary>
+        /// Writes the list.
+        /// </summary>
+        /// <param name="output">Output.</param>
+        /// <param name="message">Message.</param>
+        public static void WriteList(string output, string message)
+		{
+			if (!File.Exists(output))
+            {
+				File.WriteAllText(output, message);
+            }
+
+			File.AppendAllText(output, message);
+		}
+
+
 		/// <summary>
         /// Lists the urls.
         /// </summary>
         /// <returns>The urls.</returns>
         /// <param name="csv">csv file.</param>
-        private List<string> ListUrls(string csv)
+        public static List<string> ListUrls(string csv)
         {
             List<string> list = new List<string>();
 
@@ -92,7 +113,7 @@ namespace VerifyIP
         /// <returns>The address.</returns>
         /// <param name="url">URL.</param>
         /// <param name="timeout">Timeout. (default 3 seconds)</param>
-        private string PingAddress(string url, int timeout = 3 * 1000)
+        public static string PingAddress(string url, int timeout = 3 * 1000)
         {
             var ip = String.Empty;
             var pingSender = new Ping();
@@ -105,23 +126,24 @@ namespace VerifyIP
 			try
 			{
 				var reply = pingSender.Send(url, timeout);
-				if (reply.Status == IPStatus.Success)
+
+                switch(reply.Status)
 				{
-					ip = reply.Address.ToString();
-					Console.WriteLine("{0} -> {1}",url, reply.Address.ToString());
-                    //Console.WriteLine("Address: {0}", reply.Address.ToString());
-					//Console.WriteLine("RoundTrip time: {0}", reply.RoundtripTime);
-					//Console.WriteLine("Time to live: {0}", reply.Options.Ttl);
-					//Console.WriteLine("Don't fragment: {0}", reply.Options.DontFragment);
-					//Console.WriteLine("Buffer size: {0}", reply.Buffer.Length);
-					//Console.WriteLine("\n");
+					case IPStatus.Success:
+						ip = reply.Address.ToString();
+						Console.WriteLine( " -> {0}", reply.Address.ToString()); break;	
+					case IPStatus.TtlExpired:
+						throw new Exception("Not possible connect the domain");
+					case IPStatus.TimeExceeded:
+						throw new Exception("Timeout");
+					default:
+						throw new Exception($"Other error acurred. Status {reply.Status.ToString()}");
 				}
 			}catch(SocketException se)
 			{
 				throw new Exception(se.Message);
 			}
-
-
+            
             return ip;
         }
     }
